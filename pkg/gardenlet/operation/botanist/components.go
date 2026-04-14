@@ -193,6 +193,10 @@ func (b *Botanist) instantiateComponentsSystem() (err error) {
 	if err != nil {
 		return err
 	}
+	b.Shoot.Components.SystemComponents.OtelDataplaneDeployment, err = b.DefaultOtelDataplaneDeployment()
+	if err != nil {
+		return err
+	}
 	b.Shoot.Components.SystemComponents.NodeLocalDNS, err = b.DefaultNodeLocalDNS()
 	if err != nil {
 		return err

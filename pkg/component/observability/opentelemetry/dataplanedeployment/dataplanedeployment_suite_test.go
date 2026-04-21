@@ -2,19 +2,16 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package nodeexporter_test
+package dataplanedeployment_test
 
 import (
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	"github.com/gardener/gardener/pkg/gardenlet/features"
 )
 
-func TestNodeExporter(t *testing.T) {
-	features.RegisterFeatureGates()
+func TestDataplaneDeployment(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Component Observability Monitoring NodeExporter Suite")
+	RunSpecs(t, "Component Observability OpenTelemetry DataplaneDeployment Suite")
 }

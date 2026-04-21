@@ -18,24 +18,25 @@ The following tables are a summary of the feature gates that you can set on diff
 
 ## Feature Gates for Alpha or Beta Features
 
-| Feature                        | Default | Stage   | Since   | Until   |
-|--------------------------------|---------|---------|---------|---------|
-| DefaultSeccompProfile          | `false` | `Alpha` | `1.54`  |         |
-| InPlaceNodeUpdates             | `false` | `Alpha` | `1.113` |         |
-| IstioTLSTermination            | `false` | `Alpha` | `1.114` |         |
-| CloudProfileCapabilities       | `false` | `Alpha` | `1.117` |         |
-| OpenTelemetryCollector         | `false` | `Alpha` | `1.124` | `1.135` |
-| OpenTelemetryCollector         | `true`  | `Beta`  | `1.136` |         |
-| UseUnifiedHTTPProxyPort        | `false` | `Alpha` | `1.130` | `1.139` |
-| UseUnifiedHTTPProxyPort        | `true`  | `Beta`  | `1.140` |         |
-| VPAInPlaceUpdates              | `false` | `Alpha` | `1.133` | `1.137` |
-| VPAInPlaceUpdates              | `true`  | `Beta`  | `1.138` |         |
-| VictoriaLogsBackend            | `false` | `Alpha` | `1.137` |         |
-| CustomDNSServerInNodeLocalDNS  | `true`  | `Beta`  | `1.133` |         |
-| VPNBondingModeRoundRobin       | `false` | `Alpha` | `1.135` |         |
-| PrometheusHealthChecks         | `false` | `Alpha` | `1.135` |         |
-| RemoveVali                     | `false` | `Alpha` | `1.140` |         |
-| VersionClassificationLifecycle | `false` | `Alpha` | `1.137` |         |
+| Feature                         | Default | Stage   | Since   | Until   |
+|---------------------------------|---------|---------|---------|---------|
+| DefaultSeccompProfile           | `false` | `Alpha` | `1.54`  |         |
+| InPlaceNodeUpdates              | `false` | `Alpha` | `1.113` |         |
+| IstioTLSTermination             | `false` | `Alpha` | `1.114` |         |
+| CloudProfileCapabilities        | `false` | `Alpha` | `1.117` |         |
+| OpenTelemetryCollector          | `false` | `Alpha` | `1.124` | `1.135` |
+| OpenTelemetryCollector          | `true`  | `Beta`  | `1.136` |         |
+| UseUnifiedHTTPProxyPort         | `false` | `Alpha` | `1.130` | `1.139` |
+| UseUnifiedHTTPProxyPort         | `true`  | `Beta`  | `1.140` |         |
+| VPAInPlaceUpdates               | `false` | `Alpha` | `1.133` | `1.137` |
+| VPAInPlaceUpdates               | `true`  | `Beta`  | `1.138` |         |
+| VictoriaLogsBackend             | `false` | `Alpha` | `1.137` |         |
+| CustomDNSServerInNodeLocalDNS   | `true`  | `Beta`  | `1.133` |         |
+| VPNBondingModeRoundRobin        | `false` | `Alpha` | `1.135` |         |
+| PrometheusHealthChecks          | `false` | `Alpha` | `1.135` |         |
+| VersionClassificationLifecycle  | `false` | `Alpha` | `1.137` |         |
+| RemoveVali                      | `false` | `Alpha` | `1.140` |         |
+| OpenTelemetryDataplaneCollector | `false` | `Alpha` | `1.141` |         |
 
 ## Feature Gates for Graduated or Deprecated Features
 
@@ -275,3 +276,4 @@ A *General Availability* (GA) feature is also referred to as a *stable* feature.
 | PrometheusHealthChecks         | `gardenlet`, `gardener-operator` | Enables care controllers to query Prometheus for enhanced health checks of monitoring components. Detected health issues are reported in the respective `Shoot`, `Seed`, or `Garden` resource.                                                                                                                                                                                                                                                                                                                                                           |
 | RemoveVali                     | `gardenlet`, `gardener-operator` | Enables the automatic removal of `Vali` log aggregation components once `VictoriaLogs` has been enabled for 2 weeks. Requires `VictoriaLogsBackend` feature gate to be enabled.                                                                                                                                                                                                                                                                                                                                                                          |
 | VersionClassificationLifecycle | `gardener-apiserver`             | Enables the features introduced by GEP-32, including lifecycle-based classification for Kubernetes and machine image versions.                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| OpenTelemetryDataplaneCollector | `gardenlet`                      | Enables an `OpenTelemetry Collector` deployment in the shoot cluster's data plane for collecting metrics using Kubernetes service discovery. The collector uses the Prometheus receiver with `kubernetes_sd_config` to dynamically discover and scrape metrics from services annotated with `prometheus.io/scrape: "true"`. Collected metrics are exposed via a Prometheus exporter endpoint for scraping by the shoot's Prometheus instance.                                                                                                          |

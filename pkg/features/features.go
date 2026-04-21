@@ -113,6 +113,12 @@ const (
 	// owner: @rrhubenov
 	// alpha: v1.140.0
 	RemoveVali featuregate.Feature = "RemoveVali"
+
+	// OpenTelemetryDataplaneCollector enables an OpenTelemetry Collector deployment in the shoot cluster's data plane
+	// for collecting and filtering shoot related metrics
+	// owner: @bobi-wan @iypetrov
+	// alpha: v1.141.0
+	OpenTelemetryDataplaneCollector featuregate.Feature = "OpenTelemetryDataplaneCollector"
 )
 
 // DefaultFeatureGate is the central feature gate map used by all gardener components.
@@ -140,21 +146,22 @@ var DefaultFeatureGate = utilfeature.DefaultMutableFeatureGate
 
 // AllFeatureGates is the list of all feature gates.
 var AllFeatureGates = map[featuregate.Feature]featuregate.FeatureSpec{
-	DefaultSeccompProfile:          {Default: false, PreRelease: featuregate.Alpha},
-	NewWorkerPoolHash:              {Default: true, PreRelease: featuregate.GA, LockToDefault: true},
-	InPlaceNodeUpdates:             {Default: false, PreRelease: featuregate.Alpha},
-	IstioTLSTermination:            {Default: false, PreRelease: featuregate.Alpha},
-	CloudProfileCapabilities:       {Default: false, PreRelease: featuregate.Alpha},
-	DoNotCopyBackupCredentials:     {Default: true, PreRelease: featuregate.GA, LockToDefault: true},
-	OpenTelemetryCollector:         {Default: true, PreRelease: featuregate.Beta},
-	VictoriaLogsBackend:            {Default: false, PreRelease: featuregate.Alpha},
-	UseUnifiedHTTPProxyPort:        {Default: true, PreRelease: featuregate.Beta},
-	VPAInPlaceUpdates:              {Default: true, PreRelease: featuregate.Beta},
-	CustomDNSServerInNodeLocalDNS:  {Default: true, PreRelease: featuregate.Beta},
-	VPNBondingModeRoundRobin:       {Default: false, PreRelease: featuregate.Alpha},
-	PrometheusHealthChecks:         {Default: false, PreRelease: featuregate.Alpha},
-	VersionClassificationLifecycle: {Default: false, PreRelease: featuregate.Alpha},
-	RemoveVali:                     {Default: false, PreRelease: featuregate.Alpha},
+	DefaultSeccompProfile:           {Default: false, PreRelease: featuregate.Alpha},
+	NewWorkerPoolHash:               {Default: true, PreRelease: featuregate.Beta},
+	InPlaceNodeUpdates:              {Default: false, PreRelease: featuregate.Alpha},
+	IstioTLSTermination:             {Default: false, PreRelease: featuregate.Alpha},
+	CloudProfileCapabilities:        {Default: false, PreRelease: featuregate.Alpha},
+	DoNotCopyBackupCredentials:      {Default: true, PreRelease: featuregate.GA, LockToDefault: true},
+	OpenTelemetryCollector:          {Default: true, PreRelease: featuregate.Beta},
+	VictoriaLogsBackend:             {Default: false, PreRelease: featuregate.Alpha},
+	UseUnifiedHTTPProxyPort:         {Default: true, PreRelease: featuregate.Beta},
+	VPAInPlaceUpdates:               {Default: true, PreRelease: featuregate.Beta},
+	CustomDNSServerInNodeLocalDNS:   {Default: true, PreRelease: featuregate.Beta},
+	VPNBondingModeRoundRobin:        {Default: false, PreRelease: featuregate.Alpha},
+	PrometheusHealthChecks:          {Default: false, PreRelease: featuregate.Alpha},
+	VersionClassificationLifecycle:  {Default: false, PreRelease: featuregate.Alpha},
+	RemoveVali:                      {Default: false, PreRelease: featuregate.Alpha},
+	OpenTelemetryDataplaneCollector: {Default: false, PreRelease: featuregate.Alpha},
 }
 
 // GetFeatures returns a feature gate map with the respective specifications. Non-existing feature gates are ignored.

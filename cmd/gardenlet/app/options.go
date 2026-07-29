@@ -78,6 +78,11 @@ func (o *options) Validate() error {
 		return fmt.Errorf("seedConfig.metadata.name must be set in the gardenlet configuration")
 	}
 
+	if features.DefaultFeatureGate.Enabled(features.DataplanePrometheusFederate) &&
+		!features.DefaultFeatureGate.Enabled(features.DataplanePrometheusRollout) {
+		return fmt.Errorf("feature gate %q requires feature gate %q to be enabled", features.DataplanePrometheusFederate, features.DataplanePrometheusRollout)
+	}
+
 	return nil
 }
 

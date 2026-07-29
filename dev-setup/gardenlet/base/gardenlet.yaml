@@ -16,6 +16,7 @@ spec:
       PrometheusHealthChecks: true
       VictoriaLogsBackend: true
       LiveControlPlaneMigration: true
+      DataplanePrometheus: true
     controllers:
       shoot:
         reconcileInMaintenanceOnly: true

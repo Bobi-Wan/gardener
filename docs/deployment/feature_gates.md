@@ -41,7 +41,7 @@ The following tables are a summary of the feature gates that you can set on diff
 | BackupEntryForGarden           | `false` | `Alpha` | `1.142` | `1.146` |
 | BackupEntryForGarden           | `true`  | `Beta`  | `1.147` |         |
 | RemoveHTTPProxyLegacyPort      | `false` | `Alpha` | `1.148` |         |
-| OpenTelemetryDataplaneCollector | `false` | `Alpha` | `1.142` |         |
+| DataplanePrometheus            | `false` | `Alpha` | `1.147` |         |
 
 ## Feature Gates for Graduated or Deprecated Features
 
@@ -294,4 +294,4 @@ A *General Availability* (GA) feature is also referred to as a *stable* feature.
 | BackupEntryForGarden           | `gardener-operator`                                 | Enables deploying a `BackupEntry` extension object in the garden controller alongside the `BackupBucket` when etcd backup is configured, aligning the garden with the same extension contract that shoot clusters use for backup credential management.                                                                                                                                                                                                                                                                                                  |
 | RemoveHTTPProxyLegacyPort      | `gardenlet`                                         | Disables the unused legacy `tls-tunnel` port (8132) - and its supporting Gateway and EnvoyFilter resources - on the `istio-ingressgateway` Services. Operators can choose to remove the legacy HTTP proxy port as soon as all shoots have switched to the unified `http-proxy` port (8443), i.e. report the `UsesUnifiedHTTPProxyPort` constraint with status `True`. |
 
-| OpenTelemetryDataplaneCollector | `gardenlet`                      | Enables an `OpenTelemetry Collector` deployment in the shoot cluster's data plane for collecting metrics using Kubernetes service discovery. The collector uses the Prometheus receiver with `kubernetes_sd_config` to dynamically discover and scrape metrics from services annotated with `prometheus.io/scrape: "true"`. Collected metrics are exposed via a Prometheus exporter endpoint for scraping by the shoot's Prometheus instance.                                                                                                          |
+| DataplanePrometheus            | `gardenlet`                                         | Enables a `Prometheus` stateful set in the shoot cluster's data plane for collecting node-level metrics. It scrapes and filters targets metrics locally in the data plane and exposes them for the shoot's Prometheus instance in the seed.                                                                                                          |

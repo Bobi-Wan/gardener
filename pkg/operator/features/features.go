@@ -26,6 +26,5 @@ func RegisterFeatureGates() {
 		// flips the garden fluent-bit init image and the static ClusterOutput to
 		// the OTLP path; see https://github.com/gardener/gardener/pull/13961 for the rollout context.
 		features.OpenTelemetryCollector,
-		features.OpenTelemetryDataplaneCollector,
 	)))
 }

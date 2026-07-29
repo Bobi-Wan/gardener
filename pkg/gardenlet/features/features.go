@@ -30,6 +30,6 @@ func GetFeatures() []featuregate.Feature {
 		features.PrometheusHealthChecks,
 		features.RemoveVali,
 		features.DisableNginxIngressInSeed,
-		features.OpenTelemetryDataplaneCollector,
+		features.DataplanePrometheus,
 	}
 }

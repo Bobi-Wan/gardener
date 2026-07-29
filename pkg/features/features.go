@@ -136,11 +136,11 @@ const (
 	// beta: v1.147.0
 	BackupEntryForGarden featuregate.Feature = "BackupEntryForGarden"
 
-	// OpenTelemetryDataplaneCollector enables an OpenTelemetry Collector deployment in the shoot cluster's data plane
+	// DataplanePrometheus enables a Prometheus deployment in the shoot cluster's data plane
 	// for collecting and filtering shoot related metrics
 	// owner: @bobi-wan @iypetrov
 	// alpha: v1.147.0
-	OpenTelemetryDataplaneCollector featuregate.Feature = "OpenTelemetryDataplaneCollector"
+	DataplanePrometheus featuregate.Feature = "DataplanePrometheus"
 )
 
 // DefaultFeatureGate is the central feature gate map used by all gardener components.
@@ -168,25 +168,25 @@ var DefaultFeatureGate = utilfeature.DefaultMutableFeatureGate
 
 // AllFeatureGates is the list of all feature gates.
 var AllFeatureGates = map[featuregate.Feature]featuregate.FeatureSpec{
-	DefaultSeccompProfile:           {Default: false, PreRelease: featuregate.Alpha},
-	InPlaceNodeUpdates:              {Default: false, PreRelease: featuregate.Alpha},
-	IstioTLSTermination:             {Default: true, PreRelease: featuregate.Beta},
-	CloudProfileCapabilities:        {Default: true, PreRelease: featuregate.Beta},
-	DoNotCopyBackupCredentials:      {Default: true, PreRelease: featuregate.GA, LockToDefault: true},
-	OpenTelemetryCollector:          {Default: true, PreRelease: featuregate.Beta},
-	VictoriaLogsBackend:             {Default: false, PreRelease: featuregate.Alpha},
-	VPAInPlaceUpdates:               {Default: true, PreRelease: featuregate.GA, LockToDefault: true},
-	CustomDNSServerInNodeLocalDNS:   {Default: true, PreRelease: featuregate.Beta},
-	VPNBondingModeRoundRobin:        {Default: false, PreRelease: featuregate.Alpha},
-	PrometheusHealthChecks:          {Default: false, PreRelease: featuregate.Alpha},
-	VersionClassificationLifecycle:  {Default: false, PreRelease: featuregate.Alpha},
-	RemoveVali:                      {Default: false, PreRelease: featuregate.Alpha},
-	DisableNginxIngressInGarden:     {Default: false, PreRelease: featuregate.Alpha},
-	DisableNginxIngressInSeed:       {Default: false, PreRelease: featuregate.Alpha},
-	DisableNginxIngressInShoot:      {Default: false, PreRelease: featuregate.Alpha},
-	LiveControlPlaneMigration:       {Default: false, PreRelease: featuregate.Alpha},
-	BackupEntryForGarden:            {Default: true, PreRelease: featuregate.Beta},
-	OpenTelemetryDataplaneCollector: {Default: false, PreRelease: featuregate.Alpha},
+	DefaultSeccompProfile:          {Default: false, PreRelease: featuregate.Alpha},
+	InPlaceNodeUpdates:             {Default: false, PreRelease: featuregate.Alpha},
+	IstioTLSTermination:            {Default: true, PreRelease: featuregate.Beta},
+	CloudProfileCapabilities:       {Default: true, PreRelease: featuregate.Beta},
+	DoNotCopyBackupCredentials:     {Default: true, PreRelease: featuregate.GA, LockToDefault: true},
+	OpenTelemetryCollector:         {Default: true, PreRelease: featuregate.Beta},
+	VictoriaLogsBackend:            {Default: false, PreRelease: featuregate.Alpha},
+	VPAInPlaceUpdates:              {Default: true, PreRelease: featuregate.GA, LockToDefault: true},
+	CustomDNSServerInNodeLocalDNS:  {Default: true, PreRelease: featuregate.Beta},
+	VPNBondingModeRoundRobin:       {Default: false, PreRelease: featuregate.Alpha},
+	PrometheusHealthChecks:         {Default: false, PreRelease: featuregate.Alpha},
+	VersionClassificationLifecycle: {Default: false, PreRelease: featuregate.Alpha},
+	RemoveVali:                     {Default: false, PreRelease: featuregate.Alpha},
+	DisableNginxIngressInGarden:    {Default: false, PreRelease: featuregate.Alpha},
+	DisableNginxIngressInSeed:      {Default: false, PreRelease: featuregate.Alpha},
+	DisableNginxIngressInShoot:     {Default: false, PreRelease: featuregate.Alpha},
+	LiveControlPlaneMigration:      {Default: false, PreRelease: featuregate.Alpha},
+	BackupEntryForGarden:           {Default: true, PreRelease: featuregate.Beta},
+	DataplanePrometheus:            {Default: false, PreRelease: featuregate.Alpha},
 }
 
 // GetFeatures returns a feature gate map with the respective specifications. Non-existing feature gates are ignored.

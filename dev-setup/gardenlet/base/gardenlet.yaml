@@ -17,6 +17,7 @@ spec:
       VictoriaLogsBackend: true
       DisableNginxIngressInSeed: true
       RemoveHTTPProxyLegacyPort: true
+      DataplanePrometheus: true
     controllers:
       shoot:
         reconcileInMaintenanceOnly: true

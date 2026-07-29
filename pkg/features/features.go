@@ -149,6 +149,12 @@ const (
 	// owner: @rfranzke
 	// alpha: v1.155.0
 	AllowlistSeedReferences featuregate.Feature = "AllowlistSeedReferences"
+
+	// DataplanePrometheus enables a Prometheus deployment in the shoot cluster's data plane
+	// for collecting and filtering shoot related metrics
+	// owner: @bobi-wan @iypetrov
+	// alpha: v1.147.0
+	DataplanePrometheus featuregate.Feature = "DataplanePrometheus"
 )
 
 // DefaultFeatureGate is the central feature gate map used by all gardener components.
@@ -195,6 +201,7 @@ var AllFeatureGates = map[featuregate.Feature]featuregate.FeatureSpec{
 	RemoveHTTPProxyLegacyPort:      {Default: true, PreRelease: featuregate.Beta},
 	StrictAuditPolicyValidation:    {Default: false, PreRelease: featuregate.Alpha},
 	AllowlistSeedReferences:        {Default: false, PreRelease: featuregate.Alpha},
+	DataplanePrometheus:            {Default: false, PreRelease: featuregate.Alpha},
 }
 
 // GetFeatures returns a feature gate map with the respective specifications. Non-existing feature gates are ignored.

@@ -32,12 +32,12 @@ func CentralScrapeConfigs(namespace, clusterCASecretName string, isWorkerless bo
 	}
 
 	if !isWorkerless {
-		// Only add cadvisor and kube-kubelet scrape configs if OTEL dataplane collector is not enabled.
-		// Otherwise, the collector scrapes these targets already.
-		if !features.DefaultFeatureGate.Enabled(features.OpenTelemetryDataplaneCollector) {
+		// Only add cadvisor and kube-kubelet scrape configs if the DataplanePrometheus feature is not enabled.
+		// Otherwise, the dataplane prometheus scrapes these targets already.
+		if !features.DefaultFeatureGate.Enabled(features.DataplanePrometheus) {
 			out = append(out, cadvisorScrapeConfig(clusterCASecretName), kubeletScrapeConfig(clusterCASecretName))
 		} else {
-			out = append(out, opentelemetryCollectorDataplaneScrapeConfig(clusterCASecretName))
+			out = append(out, dataplanePrometheusScrapeConfig(clusterCASecretName))
 		}
 
 		if features.DefaultFeatureGate.Enabled(features.OpenTelemetryCollector) {
@@ -100,7 +100,7 @@ func annotatedSeedServiceEndpointsScrapeConfig(namespace string) *monitoringv1al
 				Role:       monitoringv1alpha1.KubernetesRoleEndpoint,
 				Namespaces: &monitoringv1alpha1.NamespaceDiscovery{Names: []string{namespace}},
 			}},
-			SampleLimit: new(uint64(500)),
+			SampleLimit: new(int64(500)),
 			RelabelConfigs: []monitoringv1.RelabelConfig{
 				{
 					SourceLabels: []monitoringv1.LabelName{"__meta_kubernetes_service_annotation_prometheus_io_scrape"},
@@ -185,7 +185,7 @@ func prometheusShootScrapeConfig() *monitoringv1alpha1.ScrapeConfig {
 	}
 }
 
-// used by prometheus when the OTEL dataplane deployment feature is not enabled.
+// used by prometheus when the DataplanePrometheus feature is not enabled.
 func cadvisorScrapeConfig(clusterCASecretName string) *monitoringv1alpha1.ScrapeConfig {
 	return &monitoringv1alpha1.ScrapeConfig{
 		ObjectMeta: metav1.ObjectMeta{
@@ -322,7 +322,7 @@ func cadvisorScrapeConfig(clusterCASecretName string) *monitoringv1alpha1.Scrape
 	}
 }
 
-// used by prometheus when the OTEL dataplane deployment feature is not enabled.
+// used by prometheus when the DataplanePrometheus feature is not enabled.
 func kubeletScrapeConfig(clusterCASecretName string) *monitoringv1alpha1.ScrapeConfig {
 	return &monitoringv1alpha1.ScrapeConfig{
 		ObjectMeta: metav1.ObjectMeta{
@@ -473,17 +473,19 @@ func opentelemetryCollectorNodesScrapeConfig(clusterCASecretName string) *monito
 	}
 }
 
-// used by shoot prometheus to scrape the OTEL collector deployment.
-func opentelemetryCollectorDataplaneScrapeConfig(clusterCASecretName string) *monitoringv1alpha1.ScrapeConfig {
-	podMetricsURL := "/api/v1/namespaces/kube-system/pods/${1}/proxy/metrics"
+// used by shoot prometheus to federate all metrics from the dataplane Prometheus deployment.
+func dataplanePrometheusScrapeConfig(clusterCASecretName string) *monitoringv1alpha1.ScrapeConfig {
+	podFederateURL := "/api/v1/namespaces/kube-system/pods/${1}:9090/proxy/federate"
 	return &monitoringv1alpha1.ScrapeConfig{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "otel-collector-dataplane",
+			Name: "dataplane-prometheus",
 		},
 		Spec: monitoringv1alpha1.ScrapeConfigSpec{
-			JobName:     new("otel-collector-dataplane"),
-			HonorLabels: new(true),
-			Scheme:      new(monitoringv1.SchemeHTTPS),
+			JobName:         new("dataplane-prometheus"),
+			HonorLabels:     new(true),
+			HonorTimestamps: new(false),
+			Params:          map[string][]string{"match[]": {`{__name__=~".+"}`}},
+			Scheme:          new(monitoringv1.SchemeHTTPS),
 			Authorization: &monitoringv1.SafeAuthorization{Credentials: &corev1.SecretKeySelector{
 				LocalObjectReference: corev1.LocalObjectReference{Name: AccessSecretName},
 				Key:                  resourcesv1alpha1.DataKeyToken,
@@ -510,7 +512,7 @@ func opentelemetryCollectorDataplaneScrapeConfig(clusterCASecretName string) *mo
 				{
 					SourceLabels: []monitoringv1.LabelName{"__meta_kubernetes_service_name"},
 					Action:       "keep",
-					Regex:        "otel-collector-dataplane-deployment",
+					Regex:        "dataplane-prometheus",
 				},
 				{
 					SourceLabels: []monitoringv1.LabelName{"__meta_kubernetes_endpoint_port_name"},
@@ -525,19 +527,7 @@ func opentelemetryCollectorDataplaneScrapeConfig(clusterCASecretName string) *mo
 					SourceLabels: []monitoringv1.LabelName{"__meta_kubernetes_pod_name"},
 					Regex:        `(.+)`,
 					TargetLabel:  "__metrics_path__",
-					Replacement:  new(podMetricsURL),
-				},
-				{
-					SourceLabels: []monitoringv1.LabelName{"__meta_kubernetes_pod_name"},
-					TargetLabel:  "pod",
-				},
-				{
-					SourceLabels: []monitoringv1.LabelName{"__meta_kubernetes_pod_node_name"},
-					TargetLabel:  "instance",
-				},
-				{
-					Action: "labelmap",
-					Regex:  `__meta_kubernetes_pod_label_(.+)`,
+					Replacement:  new(podFederateURL),
 				},
 			},
 		},

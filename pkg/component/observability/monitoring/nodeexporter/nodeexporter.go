@@ -83,10 +83,10 @@ type nodeExporter struct {
 func (n *nodeExporter) Deploy(ctx context.Context) error {
 	scrapeConfig := n.emptyScrapeConfig()
 
-	// When the OTEL dataplane collector is enabled, it handles scraping node-exporter metrics
-	// locally in the shoot cluster, so we skip creating the prometheus scrape config to avoid
+	// When the DataplanePrometheus feature is enabled, it handles scraping node-exporter metrics
+	// locally in the shoot data plane, so we skip creating this prometheus scrape config to avoid
 	// duplicate traffic.
-	if !features.DefaultFeatureGate.Enabled(features.OpenTelemetryDataplaneCollector) {
+	if !features.DefaultFeatureGate.Enabled(features.DataplanePrometheus) {
 		if _, err := controllerutils.GetAndCreateOrMergePatch(ctx, n.client, scrapeConfig, func() error {
 			metav1.SetMetaDataLabel(&scrapeConfig.ObjectMeta, "prometheus", shoot.Label)
 			scrapeConfig.Spec = shoot.ClusterComponentScrapeConfigSpec(
@@ -486,8 +486,8 @@ func (n *nodeExporter) computeResourcesData() (map[string][]byte, error) {
 	)
 
 	utilruntime.Must(gardenerutils.InjectNetworkPolicyAnnotationsForScrapeTargets(service, networkingv1.NetworkPolicyPort{
-		Port:     ptr.To(intstr.FromInt32(portMetrics)),
-		Protocol: ptr.To(corev1.ProtocolTCP),
+		Port:     new(intstr.FromInt32(portMetrics)),
+		Protocol: new(corev1.ProtocolTCP),
 	}))
 
 	if n.values.VPAEnabled {

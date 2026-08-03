@@ -35,6 +35,7 @@ var _ = Describe("ScrapeConfigs", func() {
 					Name: "kube-kubelet-seed",
 				},
 				Spec: monitoringv1alpha1.ScrapeConfigSpec{
+					JobName:         new("kube-kubelet-seed"),
 					HonorTimestamps: new(false),
 					MetricsPath:     new("/federate"),
 					KubernetesSDConfigs: []monitoringv1alpha1.KubernetesSDConfig{{
@@ -58,11 +59,6 @@ var _ = Describe("ScrapeConfigs", func() {
 							Regex:  "prometheus-cache;" + prometheus.ServicePorts().Web.Name,
 							Action: "keep",
 						},
-						{
-							Action:      "replace",
-							Replacement: new("kube-kubelet-seed"),
-							TargetLabel: "job",
-						},
 					},
 					MetricRelabelConfigs: []monitoringv1.RelabelConfig{{
 						Replacement: new("shoot-control-plane"),
@@ -76,6 +72,7 @@ var _ = Describe("ScrapeConfigs", func() {
 					Name: "annotated-seed-service-endpoints",
 				},
 				Spec: monitoringv1alpha1.ScrapeConfigSpec{
+					JobName:     new("annotated-seed-service-endpoints"),
 					HonorLabels: new(false),
 					KubernetesSDConfigs: []monitoringv1alpha1.KubernetesSDConfig{{
 						Role:       "Endpoints",
@@ -83,11 +80,6 @@ var _ = Describe("ScrapeConfigs", func() {
 					}},
 					SampleLimit: new(uint64(500)),
 					RelabelConfigs: []monitoringv1.RelabelConfig{
-						{
-							Action:      "replace",
-							Replacement: new("annotated-seed-service-endpoints"),
-							TargetLabel: "job",
-						},
 						{
 							SourceLabels: []monitoringv1.LabelName{"__meta_kubernetes_service_annotation_prometheus_io_scrape"},
 							Action:       "keep",
@@ -145,16 +137,12 @@ var _ = Describe("ScrapeConfigs", func() {
 					Name: "prometheus-shoot",
 				},
 				Spec: monitoringv1alpha1.ScrapeConfigSpec{
+					JobName:     new("prometheus-shoot"),
 					HonorLabels: new(false),
 					StaticConfigs: []monitoringv1alpha1.StaticConfig{{
 						Targets: []monitoringv1alpha1.Target{"localhost:9090"},
 					}},
 					RelabelConfigs: []monitoringv1.RelabelConfig{
-						{
-							Action:      "replace",
-							Replacement: new("prometheus-shoot"),
-							TargetLabel: "job",
-						},
 						{
 							Action: "labelmap",
 							Regex:  `__meta_kubernetes_service_label_(.+)`,
@@ -353,6 +341,7 @@ var _ = Describe("ScrapeConfigs", func() {
 					Name: "opentelemetry-collector-nodes",
 				},
 				Spec: monitoringv1alpha1.ScrapeConfigSpec{
+					JobName:     new("opentelemetry-collector-nodes"),
 					HonorLabels: new(false),
 					Scheme:      new(monitoringv1.SchemeHTTPS),
 					Authorization: &monitoringv1.SafeAuthorization{Credentials: &corev1.SecretKeySelector{
@@ -378,11 +367,6 @@ var _ = Describe("ScrapeConfigs", func() {
 						}}},
 					}},
 					RelabelConfigs: []monitoringv1.RelabelConfig{
-						{
-							Action:      "replace",
-							Replacement: new("opentelemetry-collector-nodes"),
-							TargetLabel: "job",
-						},
 						{
 							SourceLabels: []monitoringv1.LabelName{"__meta_kubernetes_node_name"},
 							TargetLabel:  "instance",
@@ -419,14 +403,16 @@ var _ = Describe("ScrapeConfigs", func() {
 				},
 			}
 
-			opentelemetryCollectorDataplaneScrapeConfig = &monitoringv1alpha1.ScrapeConfig{
+			dataplanePrometheusScrapeConfig = &monitoringv1alpha1.ScrapeConfig{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: "otel-collector-dataplane",
+					Name: "dataplane-prometheus",
 				},
 				Spec: monitoringv1alpha1.ScrapeConfigSpec{
-					JobName:     new("otel-collector-dataplane"),
-					HonorLabels: new(true),
-					Scheme:      new(monitoringv1.SchemeHTTPS),
+					JobName:         new("dataplane-prometheus"),
+					HonorLabels:     new(true),
+					HonorTimestamps: new(false),
+					Params:          map[string][]string{"match[]": {`{__name__=~".+"}`}},
+					Scheme:          new(monitoringv1.SchemeHTTPS),
 					Authorization: &monitoringv1.SafeAuthorization{Credentials: &corev1.SecretKeySelector{
 						LocalObjectReference: corev1.LocalObjectReference{Name: "shoot-access-prometheus-shoot"},
 						Key:                  resourcesv1alpha1.DataKeyToken,
@@ -453,7 +439,7 @@ var _ = Describe("ScrapeConfigs", func() {
 						{
 							SourceLabels: []monitoringv1.LabelName{"__meta_kubernetes_service_name"},
 							Action:       "keep",
-							Regex:        "otel-collector-dataplane-deployment",
+							Regex:        "dataplane-prometheus",
 						},
 						{
 							SourceLabels: []monitoringv1.LabelName{"__meta_kubernetes_endpoint_port_name"},
@@ -468,19 +454,7 @@ var _ = Describe("ScrapeConfigs", func() {
 							SourceLabels: []monitoringv1.LabelName{"__meta_kubernetes_pod_name"},
 							Regex:        `(.+)`,
 							TargetLabel:  "__metrics_path__",
-							Replacement:  new("/api/v1/namespaces/kube-system/pods/${1}/proxy/metrics"),
-						},
-						{
-							SourceLabels: []monitoringv1.LabelName{"__meta_kubernetes_pod_name"},
-							TargetLabel:  "pod",
-						},
-						{
-							SourceLabels: []monitoringv1.LabelName{"__meta_kubernetes_pod_node_name"},
-							TargetLabel:  "instance",
-						},
-						{
-							Action: "labelmap",
-							Regex:  `__meta_kubernetes_pod_label_(.+)`,
+							Replacement:  new("/api/v1/namespaces/kube-system/pods/${1}:9090/proxy/federate"),
 						},
 					},
 				},
@@ -529,8 +503,8 @@ var _ = Describe("ScrapeConfigs", func() {
 				})
 			})
 
-			Context("OTel Dataplane feature flag options", func() {
-				It("should return expected scrape configs with OTel Dataplane feature disabled", func() {
+			Context("dataplane Prometheus feature flag options", func() {
+				It("should return expected scrape configs with dataplane Prometheus feature disabled", func() {
 					items := append(
 						workerlessScrapeConfigs,
 						cadvisorScrapeConfig,
@@ -539,11 +513,11 @@ var _ = Describe("ScrapeConfigs", func() {
 					Expect(shoot.CentralScrapeConfigs(namespace, clusterCASecretName, false)).To(ConsistOf(items))
 				})
 
-				It("should return expected scrape configs with OTel Dataplane feature enabled", func() {
-					DeferCleanup(testutils.WithFeatureGate(features.DefaultFeatureGate, features.OpenTelemetryDataplaneCollector, true))
+				It("should return expected scrape configs with dataplane Prometheus feature enabled", func() {
+					DeferCleanup(testutils.WithFeatureGate(features.DefaultFeatureGate, features.DataplanePrometheus, true))
 					items := append(
 						workerlessScrapeConfigs,
-						opentelemetryCollectorDataplaneScrapeConfig,
+						dataplanePrometheusScrapeConfig,
 					)
 					Expect(shoot.CentralScrapeConfigs(namespace, clusterCASecretName, false)).To(HaveExactElements(items))
 				})

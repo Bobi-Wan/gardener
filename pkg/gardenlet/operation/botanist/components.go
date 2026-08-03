@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Contributors to the Gardener project
+// SPDX-FileCopyrightText: SAP SE or an SAP affiliate company and Gardener contributors
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -48,7 +48,6 @@ func (b *Botanist) instantiateComponentsExtensions(ctx context.Context) (err err
 	b.Shoot.Components.Extensions.ExternalDNSRecord = b.DefaultExternalDNSRecord()
 	b.Shoot.Components.Extensions.InternalDNSRecord = b.DefaultInternalDNSRecord()
 	b.Shoot.Components.Extensions.IngressDNSRecord = b.DefaultIngressDNSRecord()
-	b.Shoot.Components.Extensions.SelfHostedShootIngressDNSRecord = b.DefaultSelfHostedShootIngressDNSRecord()
 	b.Shoot.Components.Extensions.Infrastructure = b.DefaultInfrastructure()
 	b.Shoot.Components.Extensions.Network = b.DefaultNetwork()
 	b.Shoot.Components.Extensions.OperatingSystemConfig, err = b.DefaultOperatingSystemConfig()
@@ -71,22 +70,15 @@ func (b *Botanist) instantiateComponentsControlPlane(ctx context.Context) (err e
 	if err != nil {
 		return err
 	}
-	b.Shoot.Components.ControlPlane.EtcdMain, err = b.DefaultEtcd(ctx, v1beta1constants.ETCDRoleMain, etcd.ClassImportant)
+	b.Shoot.Components.ControlPlane.EtcdMain, err = b.DefaultEtcd(v1beta1constants.ETCDRoleMain, etcd.ClassImportant)
 	if err != nil {
 		return err
 	}
-	b.Shoot.Components.ControlPlane.EtcdEvents, err = b.DefaultEtcd(ctx, v1beta1constants.ETCDRoleEvents, etcd.ClassNormal)
+	b.Shoot.Components.ControlPlane.EtcdEvents, err = b.DefaultEtcd(v1beta1constants.ETCDRoleEvents, etcd.ClassNormal)
 	if err != nil {
 		return err
-	}
-	if !b.Shoot.IsSelfHosted() {
-		b.Shoot.Components.ControlPlane.EtcdMemberExposure = b.DefaultEtcdMemberExposure()
 	}
 	b.Shoot.Components.ControlPlane.IstioBasicAuthServer, err = b.DefaultIstioBasicAuthServer()
-	if err != nil {
-		return err
-	}
-	b.Shoot.Components.ControlPlane.Istio, err = b.DefaultIstio(ctx)
 	if err != nil {
 		return err
 	}
@@ -201,6 +193,10 @@ func (b *Botanist) instantiateComponentsSystem() (err error) {
 	if err != nil {
 		return err
 	}
+	b.Shoot.Components.SystemComponents.DataplanePrometheus, err = b.DefaultDataplanePrometheus()
+	if err != nil {
+		return err
+	}
 	b.Shoot.Components.SystemComponents.NodeLocalDNS, err = b.DefaultNodeLocalDNS()
 	if err != nil {
 		return err
@@ -225,10 +221,6 @@ func (b *Botanist) instantiateComponentsMisc() {
 	b.Shoot.Components.DependencyWatchdogAccess = b.DefaultDependencyWatchdogAccess()
 	b.Shoot.Components.GardenerAccess = b.DefaultGardenerAccess()
 	b.Shoot.Components.SourceBackupEntry = b.SourceBackupEntry()
-
-	if b.Shoot.IsSelfHosted() {
-		b.Shoot.Components.AdminAccess = b.DefaultAdminAccess()
-	}
 }
 
 func (b *Botanist) instantiateComponentsAddons() (err error) {

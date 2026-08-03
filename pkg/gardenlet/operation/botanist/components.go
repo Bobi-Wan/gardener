@@ -193,7 +193,7 @@ func (b *Botanist) instantiateComponentsSystem() (err error) {
 	if err != nil {
 		return err
 	}
-	b.Shoot.Components.SystemComponents.OtelDataplaneDeployment, err = b.DefaultOtelDataplaneDeployment()
+	b.Shoot.Components.SystemComponents.DataplanePrometheus, err = b.DefaultDataplanePrometheus()
 	if err != nil {
 		return err
 	}

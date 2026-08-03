@@ -181,19 +181,19 @@ type Extensions struct {
 
 // SystemComponents contains references to system components.
 type SystemComponents struct {
-	APIServerProxy          apiserverproxy.Interface
-	BlackboxExporter        component.DeployWaiter
-	ClusterIdentity         clusteridentity.Interface
-	CoreDNS                 coredns.Interface
-	KubeProxy               kubeproxy.Interface
-	MetricsServer           component.DeployWaiter
-	Namespaces              component.DeployWaiter
-	NodeLocalDNS            nodelocaldns.Interface
-	NodeProblemDetector     component.DeployWaiter
-	NodeExporter            component.DeployWaiter
-	Resources               shootsystem.Interface
-	VPNShoot                vpnshoot.Interface
-	OtelDataplaneDeployment component.DeployWaiter
+	APIServerProxy      apiserverproxy.Interface
+	BlackboxExporter    component.DeployWaiter
+	ClusterIdentity     clusteridentity.Interface
+	CoreDNS             coredns.Interface
+	KubeProxy           kubeproxy.Interface
+	MetricsServer       component.DeployWaiter
+	Namespaces          component.DeployWaiter
+	NodeLocalDNS        nodelocaldns.Interface
+	NodeProblemDetector component.DeployWaiter
+	NodeExporter        component.DeployWaiter
+	Resources           shootsystem.Interface
+	VPNShoot            vpnshoot.Interface
+	DataplanePrometheus component.DeployWaiter
 }
 
 // Addons contains references for the addons.

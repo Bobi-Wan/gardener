@@ -224,7 +224,7 @@ func New(ctx context.Context, o *operation.Operation) (*Botanist, error) {
 		if err != nil {
 			return nil, err
 		}
-		o.Shoot.Components.SystemComponents.OtelDataplaneDeployment, err = b.DefaultOtelDataplaneDeployment()
+		o.Shoot.Components.SystemComponents.DataplanePrometheus, err = b.DefaultDataplanePrometheus()
 		if err != nil {
 			return nil, err
 		}

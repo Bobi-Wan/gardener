@@ -378,10 +378,10 @@ func (r *Reconciler) runDeleteShootFlow(ctx context.Context, o *operation.Operat
 			SkipIf:       botanist.Shoot.IsWorkerless || !cleanupShootResources,
 			Dependencies: flow.NewTaskIDs(syncPointReadyForCleanup),
 		})
-		deleteOtelDataplaneDeployment = g.Add(flow.Task{
-			Name: "Deleting OTEL dataplane collector deployment from shoot cluster",
+		deleteDataplanePrometheus = g.Add(flow.Task{
+			Name: "Deleting Prometheus dataplane deployment from shoot cluster",
 			Fn: flow.TaskFn(func(ctx context.Context) error {
-				return botanist.Shoot.Components.SystemComponents.OtelDataplaneDeployment.Destroy(ctx)
+				return botanist.Shoot.Components.SystemComponents.DataplanePrometheus.Destroy(ctx)
 			}).RetryUntilTimeout(defaultInterval, defaultTimeout),
 			SkipIf:       botanist.Shoot.IsWorkerless || !cleanupShootResources,
 			Dependencies: flow.NewTaskIDs(syncPointReadyForCleanup),
@@ -390,7 +390,7 @@ func (r *Reconciler) runDeleteShootFlow(ctx context.Context, o *operation.Operat
 			cleanupWebhooks,
 			cleanExtendedAPIs,
 			cleanKubernetesResources,
-			deleteOtelDataplaneDeployment,
+			deleteDataplanePrometheus,
 			deleteMetricsServer,
 		)
 

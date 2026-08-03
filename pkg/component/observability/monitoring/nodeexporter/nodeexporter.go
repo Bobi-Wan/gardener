@@ -80,45 +80,55 @@ type nodeExporter struct {
 
 func (n *nodeExporter) Deploy(ctx context.Context) error {
 	scrapeConfig := n.emptyScrapeConfig()
-	if _, err := controllerutils.GetAndCreateOrMergePatch(ctx, n.client, scrapeConfig, func() error {
-		metav1.SetMetaDataLabel(&scrapeConfig.ObjectMeta, "prometheus", shoot.Label)
-		scrapeConfig.Spec = shoot.ClusterComponentScrapeConfigSpec(
-			name,
-			shoot.KubernetesServiceDiscoveryConfig{
-				Role:             monitoringv1alpha1.KubernetesRoleEndpoint,
-				ServiceName:      name,
-				EndpointPortName: portNameMetrics,
-			},
-			"node_boot_time_seconds",
-			"node_cpu_seconds_total",
-			"node_disk_read_bytes_total",
-			"node_disk_written_bytes_total",
-			"node_disk_io_time_weighted_seconds_total",
-			"node_disk_io_time_seconds_total",
-			"node_disk_write_time_seconds_total",
-			"node_disk_writes_completed_total",
-			"node_disk_read_time_seconds_total",
-			"node_disk_reads_completed_total",
-			"node_filesystem_avail_bytes",
-			"node_filesystem_files",
-			"node_filesystem_files_free",
-			"node_filesystem_free_bytes",
-			"node_filesystem_readonly",
-			"node_filesystem_size_bytes",
-			"node_load1",
-			"node_load15",
-			"node_load5",
-			"node_memory_.+",
-			"node_nf_conntrack_.+",
-			"node_scrape_collector_duration_seconds",
-			"node_scrape_collector_success",
-			"process_max_fds",
-			"process_open_fds",
-			"node_netstat_Tcp_CurrEstab",
-		)
-		return nil
-	}); err != nil {
-		return err
+
+	// When the DataplanePrometheus feature is enabled, it handles scraping node-exporter metrics
+	// locally in the shoot data plane, so we skip creating this prometheus scrape config to avoid
+	// duplicate traffic.
+	if !features.DefaultFeatureGate.Enabled(features.DataplanePrometheus) {
+		if _, err := controllerutils.GetAndCreateOrMergePatch(ctx, n.client, scrapeConfig, func() error {
+			metav1.SetMetaDataLabel(&scrapeConfig.ObjectMeta, "prometheus", shoot.Label)
+			scrapeConfig.Spec = shoot.ClusterComponentScrapeConfigSpec(
+				name,
+				shoot.KubernetesServiceDiscoveryConfig{
+					Role:             monitoringv1alpha1.KubernetesRoleEndpoint,
+					ServiceName:      name,
+					EndpointPortName: portNameMetrics,
+				},
+				"node_boot_time_seconds",
+				"node_cpu_seconds_total",
+				"node_disk_read_bytes_total",
+				"node_disk_written_bytes_total",
+				"node_disk_io_time_weighted_seconds_total",
+				"node_disk_io_time_seconds_total",
+				"node_disk_write_time_seconds_total",
+				"node_disk_writes_completed_total",
+				"node_disk_read_time_seconds_total",
+				"node_disk_reads_completed_total",
+				"node_filesystem_avail_bytes",
+				"node_filesystem_files",
+				"node_filesystem_files_free",
+				"node_filesystem_free_bytes",
+				"node_filesystem_readonly",
+				"node_filesystem_size_bytes",
+				"node_load1",
+				"node_load15",
+				"node_load5",
+				"node_memory_.+",
+				"node_nf_conntrack_.+",
+				"node_scrape_collector_duration_seconds",
+				"node_scrape_collector_success",
+				"process_max_fds",
+				"process_open_fds",
+			)
+			return nil
+		}); err != nil {
+			return err
+		}
+	} else {
+		// Delete the scrape config if it exists (cleanup from previous state)
+		if err := kubernetesutils.DeleteObjects(ctx, n.client, scrapeConfig); err != nil {
+			return err
+		}
 	}
 
 	prometheusRule := n.emptyPrometheusRule()
@@ -480,6 +490,11 @@ func (n *nodeExporter) computeResourcesData() (map[string][]byte, error) {
 
 		vpa *vpaautoscalingv1.VerticalPodAutoscaler
 	)
+
+	utilruntime.Must(gardenerutils.InjectNetworkPolicyAnnotationsForScrapeTargets(service, networkingv1.NetworkPolicyPort{
+		Port:     new(intstr.FromInt32(portMetrics)),
+		Protocol: new(corev1.ProtocolTCP),
+	}))
 
 	if n.values.VPAEnabled {
 		vpaUpdateMode := vpaautoscalingv1.UpdateModeInPlaceOrRecreate

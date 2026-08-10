@@ -193,6 +193,10 @@ func (b *Botanist) instantiateComponentsSystem() (err error) {
 	if err != nil {
 		return err
 	}
+	b.Shoot.Components.SystemComponents.DataplanePrometheus, err = b.DefaultDataplanePrometheus()
+	if err != nil {
+		return err
+	}
 	b.Shoot.Components.SystemComponents.NodeLocalDNS, err = b.DefaultNodeLocalDNS()
 	if err != nil {
 		return err

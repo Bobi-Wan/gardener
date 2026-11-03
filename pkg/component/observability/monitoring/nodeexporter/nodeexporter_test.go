@@ -462,8 +462,15 @@ status: {}
 			Expect(managedResourceSecret.Immutable).To(Equal(new(true)))
 			Expect(managedResourceSecret.Labels["resources.gardener.cloud/garbage-collectable-reference"]).To(Equal("true"))
 			actualScrapeConfig := &monitoringv1alpha1.ScrapeConfig{}
+<<<<<<< HEAD
 			Expect(c.Get(ctx, client.ObjectKeyFromObject(scrapeConfig), actualScrapeConfig)).To(Succeed())
 			Expect(actualScrapeConfig).To(DeepEqual(scrapeConfig))
+=======
+			if !features.DefaultFeatureGate.Enabled(features.DataplanePrometheus) {
+				Expect(c.Get(ctx, client.ObjectKeyFromObject(scrapeConfig), actualScrapeConfig)).To(Succeed())
+				Expect(actualScrapeConfig).To(DeepEqual(scrapeConfig))
+			}
+>>>>>>> 79f8ea0a9a (rename and modify scrapeconfig creation for shoot Prometheus and)
 
 			actualPrometheusRule := &monitoringv1.PrometheusRule{}
 			Expect(c.Get(ctx, client.ObjectKeyFromObject(prometheusRule), actualPrometheusRule)).To(Succeed())

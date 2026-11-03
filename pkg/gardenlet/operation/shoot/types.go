@@ -199,6 +199,7 @@ type SystemComponents struct {
 	NodeExporter        component.DeployWaiter
 	Resources           shootsystem.Interface
 	VPNShoot            vpnshoot.Interface
+	DataplanePrometheus component.DeployWaiter
 }
 
 // Addons contains references for the addons.

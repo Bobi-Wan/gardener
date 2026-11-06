@@ -1042,6 +1042,11 @@ func (b *Botanist) ReconcileSystemComponentsTaskGroup(kubeProxyEnabled, skipRead
 			SkipIf: b.Shoot.IsWorkerless || b.Shoot.HibernationEnabled,
 		})
 		_ = g.Add(flow.Task{
+			Name:   "Deploying dataplane Prometheus component to shoot cluster",
+			Fn:     flow.TaskFn(b.ReconcileDataplanePrometheus).RetryUntilTimeout(defaultInterval, defaultTimeout),
+			SkipIf: b.Shoot.IsWorkerless || b.Shoot.HibernationEnabled,
+		})
+		_ = g.Add(flow.Task{
 			Name:   "Deploying addon Kubernetes Dashboard",
 			Fn:     flow.TaskFn(b.DeployKubernetesDashboard).RetryUntilTimeout(defaultInterval, defaultTimeout),
 			SkipIf: b.Shoot.IsWorkerless || b.Shoot.HibernationEnabled || b.Shoot.IsSelfHosted(),

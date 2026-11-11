@@ -85,10 +85,8 @@ type nodeExporter struct {
 func (n *nodeExporter) Deploy(ctx context.Context) error {
 	scrapeConfig := n.emptyScrapeConfig()
 
-	// When the DataplanePrometheus feature is enabled, it handles scraping node-exporter metrics
-	// locally in the shoot data plane, so we skip creating this prometheus scrape config to avoid
-	// duplicate traffic.
-	if !features.DefaultFeatureGate.Enabled(features.DataplanePrometheus) {
+	// if the gardenlet DataplaneAgentFederate feature gate is enabled, node-exporter metrics are received through federation of the dataplane Prometheus instance, not scraped directly
+	if !features.DefaultFeatureGate.Enabled(features.DataplaneAgentFederate) {
 		if _, err := controllerutils.GetAndCreateOrMergePatch(ctx, n.client, scrapeConfig, func() error {
 			metav1.SetMetaDataLabel(&scrapeConfig.ObjectMeta, "prometheus", shoot.Label)
 			scrapeConfig.Spec = shoot.ClusterComponentScrapeConfigSpec(

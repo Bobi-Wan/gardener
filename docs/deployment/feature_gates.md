@@ -38,7 +38,8 @@ The following tables are a summary of the feature gates that you can set on diff
 | RemoveHTTPProxyLegacyPort      | `true`  | `Beta`  | `1.154` |         |
 | StrictAuditPolicyValidation    | `false` | `Alpha` | `1.152` |         |
 | AllowlistSeedReferences        | `false` | `Alpha` | `1.155` |         |
-| DataplanePrometheus            | `false` | `Alpha` | `1.156` |         |
+| DataplaneAgentRollout          | `false` | `Alpha` | `1.156` |         |
+| DataplaneAgentFederate         | `false` | `Alpha` | `1.156` |         |
 
 ## Feature Gates for Graduated or Deprecated Features
 

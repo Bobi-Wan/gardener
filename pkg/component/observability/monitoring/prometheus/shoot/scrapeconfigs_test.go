@@ -507,7 +507,7 @@ var _ = Describe("ScrapeConfigs", func() {
 				})
 
 				It("should return expected scrape configs with dataplane Prometheus feature enabled", func() {
-					DeferCleanup(testutils.WithFeatureGate(features.DefaultFeatureGate, features.DataplanePrometheus, true))
+					DeferCleanup(testutils.WithFeatureGate(features.DefaultFeatureGate, features.DataplaneAgentFederate, true))
 					items := append(
 						append([]*monitoringv1alpha1.ScrapeConfig{}, workerlessScrapeConfigs...),
 						dataplanePrometheusScrapeConfig,

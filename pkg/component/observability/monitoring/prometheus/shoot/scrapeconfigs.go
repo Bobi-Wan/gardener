@@ -32,9 +32,9 @@ func CentralScrapeConfigs(namespace, clusterCASecretName string, isWorkerless, s
 	}
 
 	if !isWorkerless {
-		// Only add cadvisor and kube-kubelet scrape configs if the DataplanePrometheus feature is not enabled.
+		// Only add cadvisor and kube-kubelet scrape configs if the DataplaneAgentFederate feature is not enabled.
 		// Otherwise, the dataplane prometheus scrapes these targets already.
-		if !features.DefaultFeatureGate.Enabled(features.DataplanePrometheus) {
+		if !features.DefaultFeatureGate.Enabled(features.DataplaneAgentFederate) {
 			out = append(out, cadvisorScrapeConfig(clusterCASecretName), kubeletScrapeConfig(clusterCASecretName))
 		} else {
 			out = append(out, dataplanePrometheusScrapeConfig(clusterCASecretName))

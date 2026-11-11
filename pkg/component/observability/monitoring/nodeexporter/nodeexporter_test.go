@@ -465,7 +465,7 @@ status: {}
 			Expect(managedResourceSecret.Immutable).To(Equal(new(true)))
 			Expect(managedResourceSecret.Labels["resources.gardener.cloud/garbage-collectable-reference"]).To(Equal("true"))
 			actualScrapeConfig := &monitoringv1alpha1.ScrapeConfig{}
-			if !features.DefaultFeatureGate.Enabled(features.DataplanePrometheus) {
+			if !features.DefaultFeatureGate.Enabled(features.DataplaneAgentFederate) {
 				Expect(c.Get(ctx, client.ObjectKeyFromObject(scrapeConfig), actualScrapeConfig)).To(Succeed())
 				Expect(actualScrapeConfig).To(DeepEqual(scrapeConfig))
 			}

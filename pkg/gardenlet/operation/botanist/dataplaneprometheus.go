@@ -41,7 +41,7 @@ func (b *Botanist) DefaultDataplanePrometheus() (component.DeployWaiter, error) 
 // ReconcileDataplanePrometheus deploys or destroys the dataplane Prometheus component
 // depending on whether the feature gate is enabled and shoot monitoring is enabled.
 func (b *Botanist) ReconcileDataplanePrometheus(ctx context.Context) error {
-	if !features.DefaultFeatureGate.Enabled(features.DataplanePrometheus) ||
+	if !features.DefaultFeatureGate.Enabled(features.DataplaneAgentRollout) ||
 		!b.IsShootMonitoringEnabled() {
 		return b.Shoot.Components.SystemComponents.DataplanePrometheus.Destroy(ctx)
 	}

@@ -323,12 +323,20 @@ func (d *dataplanePrometheus) getStatefulSet(configMapName, serviceAccountName s
 								},
 							},
 						},
-						{
-							Name: volumeNameData,
-							VolumeSource: corev1.VolumeSource{
-								EmptyDir: &corev1.EmptyDirVolumeSource{
-									SizeLimit: new(resource.MustParse("2Gi")),
-								},
+					},
+				},
+			},
+			VolumeClaimTemplates: []corev1.PersistentVolumeClaim{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:   volumeNameData,
+						Labels: getLabels(),
+					},
+					Spec: corev1.PersistentVolumeClaimSpec{
+						AccessModes: []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce},
+						Resources: corev1.VolumeResourceRequirements{
+							Requests: corev1.ResourceList{
+								corev1.ResourceStorage: resource.MustParse("5Gi"),
 							},
 						},
 					},

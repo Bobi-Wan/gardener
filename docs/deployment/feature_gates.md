@@ -38,6 +38,8 @@ The following tables are a summary of the feature gates that you can set on diff
 | RemoveHTTPProxyLegacyPort      | `true`  | `Beta`  | `1.154` |         |
 | StrictAuditPolicyValidation    | `false` | `Alpha` | `1.152` |         |
 | AllowlistSeedReferences        | `false` | `Alpha` | `1.155` |         |
+| DataplaneAgentRollout          | `false` | `Alpha` | `1.156` |         |
+| DataplaneAgentFederate         | `false` | `Alpha` | `1.156` |         |
 
 ## Feature Gates for Graduated or Deprecated Features
 
@@ -305,3 +307,4 @@ A *General Availability* (GA) feature is also referred to as a *stable* feature.
 | RemoveHTTPProxyLegacyPort      | `gardenlet`                                         | Disables the unused legacy `tls-tunnel` port (8132) - and its supporting Gateway and EnvoyFilter resources - on the `istio-ingressgateway` Services. Operators can choose to remove the legacy HTTP proxy port as soon as all shoots have switched to the unified `http-proxy` port (8443), i.e. report the `UsesUnifiedHTTPProxyPort` constraint with status `True`. |
 | StrictAuditPolicyValidation    | `gardener-admission-controller`, `gardener-operator` | Rejects a Shoot's or Garden's referenced audit policy ConfigMap if it contains unknown or misspelled fields, instead of silently dropping them. |
 | AllowlistSeedReferences        | `gardener-apiserver`                                | Enforces that resources (`Secret`s, `ConfigMap`s, `WorkloadIdentity`s) referenced in a `Seed`'s spec must carry the `seed.gardener.cloud/names` annotation listing the seed's name (or `*` as a wildcard) before the reference is accepted. `gardener-controller-manager` automatically stamps the annotation on create/update/delete of `Gardenlet` or `ManagedSeed` objects. |
+| DataplanePrometheus            | `gardenlet`                                         | Enables a `Prometheus` stateful set in the shoot cluster's data plane for collecting node-level metrics. It scrapes and filters targets metrics locally in the data plane and exposes them for the shoot's Prometheus instance in the seed.                                                                                                          |

@@ -28,6 +28,7 @@ import (
 	resourcesv1alpha1 "github.com/gardener/gardener/pkg/apis/resources/v1alpha1"
 	"github.com/gardener/gardener/pkg/client/kubernetes"
 	. "github.com/gardener/gardener/pkg/component/shoot/system"
+	"github.com/gardener/gardener/pkg/features"
 	"github.com/gardener/gardener/pkg/resourcemanager/controller/garbagecollector/references"
 	"github.com/gardener/gardener/pkg/utils/retry"
 	retryfake "github.com/gardener/gardener/pkg/utils/retry/fake"
@@ -457,6 +458,36 @@ var _ = Describe("ShootSystem", func() {
 					},
 				}
 
+				networkPolicyToNodeExporter = &networkingv1.NetworkPolicy{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "gardener.cloud--allow-to-node-exporter",
+						Namespace: "kube-system",
+						Annotations: map[string]string{
+							"gardener.cloud/description": "Allows egress traffic to node exporter in TCP port 16909 for pods labeled with 'networking.gardener.cloud/to-node-exporter=allowed'.",
+						},
+					},
+					Spec: networkingv1.NetworkPolicySpec{
+						PodSelector: metav1.LabelSelector{
+							MatchLabels: map[string]string{
+								"networking.gardener.cloud/to-node-exporter": "allowed",
+							},
+						},
+						Egress: []networkingv1.NetworkPolicyEgressRule{
+							{
+								Ports: []networkingv1.NetworkPolicyPort{
+									{
+										Protocol: new(corev1.ProtocolTCP),
+										Port:     new(intstr.FromInt32(16909)),
+									},
+								},
+							},
+						},
+						PolicyTypes: []networkingv1.PolicyType{
+							networkingv1.PolicyTypeEgress,
+						},
+					},
+				}
+
 				networkPolicyToPublicNetworks = &networkingv1.NetworkPolicy{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "gardener.cloud--allow-to-public-networks",
@@ -502,6 +533,20 @@ var _ = Describe("ShootSystem", func() {
 					networkPolicyToPublicNetworks,
 					networkPolicyDenyAll,
 				))
+			})
+
+			It("should not deploy the node-exporter NetworkPolicy when DataplanePrometheusRollout is disabled", func() {
+				Expect(managedResource).NotTo(contain(networkPolicyToNodeExporter))
+			})
+
+			Context("DataplanePrometheusRollout enabled", func() {
+				BeforeEach(func() {
+					DeferCleanup(test.WithFeatureGate(features.DefaultFeatureGate, features.DataplanePrometheusRollout, true))
+				})
+
+				It("should deploy the node-exporter NetworkPolicy", func() {
+					Expect(managedResource).To(contain(networkPolicyToNodeExporter))
+				})
 			})
 
 			Context("self-hosted", func() {

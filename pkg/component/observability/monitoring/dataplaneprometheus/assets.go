@@ -13,3 +13,9 @@ import (
 //
 //go:embed assets/dataplane-prometheus-config.yaml
 var prometheusConfig string
+
+// GetPrometheusConfig returns the embedded Prometheus configuration for scraping
+// kubelet, cadvisor, and node-exporter metrics in the shoot data plane.
+func GetPrometheusConfig() string {
+	return prometheusConfig
+}
